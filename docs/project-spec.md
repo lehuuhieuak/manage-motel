@@ -49,18 +49,19 @@ Hệ thống sử dụng microservice để phục vụ mục tiêu học tập 
 
 * Backend: .NET 10 và Go.
 * Frontend: React và TypeScript.
-* Database: PostgreSQL.
+* Database: SQL Server for .NET services and PostgreSQL for Go services.
 * Message broker: RabbitMQ.
 * Đồng bộ giữa service: REST hoặc gRPC.
 * Bất đồng bộ giữa service: Integration Event qua RabbitMQ.
 * API Gateway: YARP.
-* Local development: Docker Compose hoặc .NET Aspire.
+* Local development: .NET Aspire as the primary orchestrator, with Docker Compose as an optional fallback.
 * Observability: OpenTelemetry, Prometheus, Grafana, Loki và Tempo.
 * Testing: xUnit, Go testing và Testcontainers.
 
 ### Nguyên tắc kiến trúc
 
 * Mỗi service sở hữu database riêng.
+* Identity, Rental và Billing sử dụng SQL Server; Metering và Payment sử dụng PostgreSQL.
 * Không query trực tiếp database của service khác.
 * Không sử dụng foreign key xuyên service.
 * Giao tiếp đồng bộ chỉ dùng khi cần kết quả ngay.
@@ -160,7 +161,7 @@ Go stack:
 * gRPC Go.
 * slog.
 * OpenTelemetry.
-* golang-migrate hoặc Goose.
+* Goose cho migration PostgreSQL.
 
 ### 4.4. Billing Service — .NET
 
@@ -379,7 +380,8 @@ Cần theo dõi:
 
 ### Integration test
 
-* PostgreSQL thật qua Testcontainers.
+* SQL Server thật qua Testcontainers cho service .NET.
+* PostgreSQL thật qua Testcontainers cho service Go.
 * RabbitMQ thật qua Testcontainers.
 * Outbox publish event.
 * Inbox chống xử lý trùng.
@@ -425,7 +427,9 @@ Labels chung:
 * react.
 * rabbitmq.
 * postgresql.
+* sql-server.
 * grpc.
+* aspire.
 * observability.
 * payment.
 

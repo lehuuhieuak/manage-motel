@@ -149,7 +149,9 @@ golang
 react
 typescript
 postgresql
+sql-server
 rabbitmq
+aspire
 grpc
 rest-api
 yarp
@@ -682,8 +684,9 @@ Recommended MVP sequence:
 ## Sprint 0 — Foundation
 
 * Repository structure.
-* Docker Compose or Aspire.
-* PostgreSQL.
+* .NET Aspire as the primary local orchestrator.
+* SQL Server for .NET services.
+* PostgreSQL for Go services.
 * RabbitMQ.
 * API Gateway.
 * Shared event conventions.

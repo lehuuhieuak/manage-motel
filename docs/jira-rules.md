@@ -146,6 +146,7 @@ platform
 ```text
 dotnet
 golang
+gin
 react
 typescript
 postgresql

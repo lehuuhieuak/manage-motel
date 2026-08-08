@@ -164,9 +164,58 @@ service/
 └── sql/
 ```
 
-`sqlc` generates typed query code from PostgreSQL SQL. Goose manages PostgreSQL
-SQL migrations. SQL files are versioned per service and are never shared across
-service databases.
+### Folder responsibilities
+
+| Folder | Responsibility | May depend on |
+|---|---|---|
+| `cmd/<service>` | Composition root: reads configuration, constructs concrete dependencies, starts HTTP server and background workers, and handles orderly shutdown. | Every internal package, only for wiring. |
+| `internal/domain` | Aggregates, entities, value objects, domain errors, invariants, and domain events. | Go standard library only; no application, framework, database, or messaging package. |
+| `internal/application` | Use cases, commands/queries as ordinary Go request structs, transaction boundaries, authorization decisions, and port interfaces. | `domain` only. |
+| `internal/transport` | Gin routes, HTTP middleware, request binding/validation, response and Problem Details mapping, OpenAPI and health endpoints. | `application` and `domain` types needed for mapping. |
+| `internal/adapters` | Boundary adapters for external contracts, such as RabbitMQ event consumers, event DTO mappers, and payment-provider contract mapping. | `application` and `domain`; it does not contain persistence or business rules. |
+| `internal/infrastructure` | Concrete technical implementations: `pgx`/`sqlc` repositories, Goose migration runner support, RabbitMQ publisher/consumer client wiring, Outbox/Inbox storage, OpenTelemetry exporters, and configuration implementations. | `application` port interfaces and `domain` types. |
+| `migrations` | Versioned Goose PostgreSQL migrations for this service database. It is not an importable Go package. | PostgreSQL SQL only. |
+| `sql` | Handwritten PostgreSQL schema/query inputs for `sqlc` and `sqlc` configuration. | PostgreSQL SQL only. |
+
+`sqlc` generates typed query code from PostgreSQL SQL. Generated code belongs
+under the persistence portion of `internal/infrastructure` (for example,
+`internal/infrastructure/persistence/sqlc`) and is mapped to domain types
+before Application code sees it. Goose manages the versioned PostgreSQL SQL
+migrations in `migrations`. SQL files are versioned per service and are never
+shared across service databases.
+
+### Go dependency direction
+
+Dependencies point inward, toward `domain`:
+
+```text
+cmd (composition only)
+ ├── transport (Gin HTTP) ────────> application ────────> domain
+ ├── adapters (RabbitMQ/provider) ─> application ────────> domain
+ └── infrastructure (pgx/sqlc/AMQP) ─> application ports + domain types
+```
+
+The Application layer defines the ports it needs, for example a `MeterRepository`,
+`Outbox`, or `PaymentProvider`. Infrastructure implements those ports. The
+`cmd` package injects the concrete implementations into Application use cases.
+This keeps a use case testable with in-memory fakes and prevents it from
+importing Gin, `pgx`, `sqlc`, RabbitMQ, or PostgreSQL types.
+
+The following imports are not allowed:
+
+- `domain` must not import any other internal layer.
+- `application` must not import `transport`, `adapters`, or `infrastructure`.
+- `transport` and `adapters` must not query PostgreSQL or publish RabbitMQ
+  messages directly; they call an Application use case.
+- `infrastructure` must not contain business decisions; it implements ports
+  and maps technical data to/from domain types.
+
+Gin is the HTTP transport framework for Go services. Route definitions,
+middleware, request binding, response mapping, and health endpoints live in
+`internal/transport`; handlers call Application use cases and must not contain
+domain rules or SQL. Gin is built on `net/http`, so standard Go HTTP middleware
+and OpenTelemetry instrumentation remain compatible. `chi` is not used in the
+MVP.
 
 ## Service boundaries
 

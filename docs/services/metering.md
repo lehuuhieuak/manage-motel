@@ -24,9 +24,11 @@ adjustment is created.
 
 ## Go implementation
 
-The service uses `pgx`, `sqlc`, Goose migrations, `amqp091-go`, `slog`, and
-OpenTelemetry. `sqlc` generated code stays in the infrastructure/adapter
-boundary and is mapped to domain types before application logic uses it.
+The service uses Gin, `pgx`, `sqlc`, Goose migrations, `amqp091-go`, `slog`,
+and OpenTelemetry. Gin handlers live in the transport boundary and call
+Application use cases; they do not contain domain rules or SQL. `sqlc`
+generated code stays in the infrastructure/adapter boundary and is mapped to
+domain types before application logic uses it.
 
 ## API examples
 

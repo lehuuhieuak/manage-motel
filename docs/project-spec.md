@@ -58,6 +58,28 @@ Hệ thống sử dụng microservice để phục vụ mục tiêu học tập 
 * Observability: OpenTelemetry, Prometheus, Grafana, Loki và Tempo.
 * Testing: xUnit, Go testing và Testcontainers.
 
+### Backend service stack
+
+Các service .NET (Identity, Rental và Billing) dùng:
+
+* ASP.NET Core 10 Web API.
+* Clean Architecture với bốn project `Api`, `Application`, `Domain` và
+  `Infrastructure`.
+* EF Core với SQL Server provider và EF Core migrations.
+* YARP cho API Gateway.
+* OpenTelemetry, health checks và resilience defaults qua
+  `ManageMotel.ServiceDefaults`.
+* xUnit cho unit/integration test; SQL Server Testcontainers cho persistence
+  integration test.
+
+Các service Go (Metering và Payment) dùng:
+
+* Gin làm HTTP framework. Gin chạy trên `net/http`; không dùng `chi` trong MVP.
+* Clean Architecture với `cmd`, `internal/domain`, `internal/application`,
+  `internal/adapters`, `internal/infrastructure` và `internal/transport`.
+* `pgx`, `sqlc` và Goose cho PostgreSQL persistence/migration.
+* `amqp091-go`, `slog`, OpenTelemetry và standard `testing` package.
+
 ### Nguyên tắc kiến trúc
 
 * Mỗi service sở hữu database riêng.
@@ -154,7 +176,7 @@ Integration event:
 
 Go stack:
 
-* net/http hoặc chi.
+* Gin (HTTP framework, chạy trên `net/http`).
 * pgx.
 * sqlc.
 * amqp091-go.

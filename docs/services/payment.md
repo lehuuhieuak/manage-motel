@@ -68,7 +68,8 @@ Billing consumes these events and updates its own payment snapshot.
 
 ## Persistence and tests
 
-Payment owns PostgreSQL database `payment_db` and uses Go, `pgx`, `sqlc`, Goose,
-and `amqp091-go`.
+Payment owns PostgreSQL database `payment_db` and uses Go, Gin, `pgx`, `sqlc`,
+Goose, and `amqp091-go`. Gin handlers stay in the transport boundary and invoke
+Application use cases rather than embedding payment state rules.
 Tests must cover duplicate webhooks, provider failures, idempotency keys,
 invalid state transitions, and Outbox publication.

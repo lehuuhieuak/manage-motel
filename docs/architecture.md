@@ -286,6 +286,98 @@ pending payments.
 - Payment: duplicate webhook and idempotency tests are mandatory.
 - .NET tests use xUnit; Go tests use the standard `testing` package.
 
+### Test placement and naming
+
+Tests belong to the service that owns the behavior. They are never placed in a
+shared cross-service test project, and integration tests must use only the
+dependencies owned or consumed by the service under test.
+
+#### .NET services
+
+Each .NET service keeps test projects in a `tests/` folder at its service root:
+
+```text
+services/Identity/
+├── Identity.Api/
+├── Identity.Application/
+├── Identity.Domain/
+├── Identity.Infrastructure/
+└── tests/
+    ├── Identity.Domain.Tests/
+    ├── Identity.Application.Tests/
+    ├── Identity.Infrastructure.IntegrationTests/
+    └── Identity.Api.IntegrationTests/
+```
+
+The same pattern applies to Rental and Billing, replacing `Identity` with the
+service name.
+
+| Test project | Purpose | Allowed references |
+|---|---|---|
+| `<Service>.Domain.Tests` | Aggregate/value-object invariants and domain state transitions. | `<Service>.Domain` only. |
+| `<Service>.Application.Tests` | Use cases, validation, authorization rules, and application ports with fakes/mocks. | `<Service>.Application` and `<Service>.Domain`; no real database or broker. |
+| `<Service>.Infrastructure.IntegrationTests` | EF Core mappings, repositories, migrations, Outbox/Inbox persistence, and concrete adapters against Testcontainers. | Infrastructure plus its Application/Domain dependencies. |
+| `<Service>.Api.IntegrationTests` | Public HTTP behavior, authentication/authorization, Problem Details mapping, and endpoint-to-use-case wiring through the API boundary. | API host and test-only fixtures; dependencies run through Testcontainers or test doubles at the composition root. |
+
+Use the `*.Tests` or `*.IntegrationTests` project suffix shown above. Within a
+project, test classes mirror the production namespace/folder where practical,
+for example `Domain/Rooms/RoomTests.cs` tests `Domain/Rooms/Room.cs`. Tests must
+not live in production `Api`, `Application`, `Domain`, or `Infrastructure`
+projects.
+
+#### Go services
+
+Unit tests are colocated with the package they test and use the standard
+`*_test.go` convention. Integration tests are isolated beneath `tests/` at the
+Go service root:
+
+```text
+services/metering/
+├── cmd/metering/
+├── internal/
+│   ├── domain/
+│   │   └── meter_test.go
+│   ├── application/
+│   │   └── record_reading_test.go
+│   ├── transport/
+│   │   └── meter_handler_test.go
+│   └── infrastructure/
+│       └── persistence/
+│           └── repository_test.go
+└── tests/
+    └── integration/
+        ├── postgres_repository_test.go
+        ├── rabbitmq_outbox_test.go
+        └── api_test.go
+```
+
+`internal/domain` and `internal/application` tests use in-memory fakes and do
+not require Docker. Package-level transport tests may use Gin's test helpers.
+`tests/integration` contains only tests that require PostgreSQL, RabbitMQ, or
+the running HTTP composition; it uses Testcontainers and is run explicitly in
+local development and CI. Integration tests may access `internal` packages
+because the `tests/` directory remains inside that service's module root.
+
+Payment follows the same structure. Generated `sqlc` code is not tested
+directly; test its repository adapter behavior through
+`internal/infrastructure` unit or integration tests.
+
+#### Frontend
+
+Frontend tests are colocated with the UI or utility they verify:
+
+```text
+frontend/src/
+├── features/rooms/RoomForm.test.tsx
+├── services/httpClient.test.ts
+└── shared/validation/contract.test.ts
+```
+
+Cross-feature browser or Gateway workflows, when introduced, belong in
+`frontend/tests/e2e/` and must not be mixed with component tests. A frontend
+test framework is selected when the frontend test task is implemented; this
+document only fixes placement and scope.
+
 ## Explicit exclusions
 
 The MVP does not introduce Kubernetes, Kafka, service mesh, full Event Sourcing,

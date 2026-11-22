@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/Identity/">
+    <Project Path="../services/Identity/Identity.API/Identity.API.csproj" />
+    <Project Path="../services/Identity/Identity.Application/Identity.Application.csproj" />
+    <Project Path="../services/Identity/Identity.Domain/Identity.Domain.csproj" />
+    <Project Path="../services/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Billing/">
+    <Project Path="../services/Billing/Billing.API/Billing.API.csproj" />
+    <Project Path="../services/Billing/Billing.Application/Billing.Application.csproj" />
+    <Project Path="../services/Billing/Billing.Domain/Billing.Domain.csproj" />
+    <Project Path="../services/Billing/Billing.Infrastructure/Billing.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Rental/">
+    <Project Path="../services/Rental/Rental.API/Rental.API.csproj" />
+    <Project Path="../services/Rental/Rental.Application/Rental.Application.csproj" />
+    <Project Path="../services/Rental/Rental.Domain/Rental.Domain.csproj" />
+    <Project Path="../services/Rental/Rental.Infrastructure/Rental.Infrastructure.csproj" />
+  </Folder>
+  <Project Path="../Gateway/Gateway.csproj" />
+  <Project Path="../ManageMotel.ServiceDefaults/ServiceDefault/ManageMotel.ServiceDefault.csproj" Id="1c809a76-0d77-4ed8-a7e9-b7c840b7753c" />
+  <Project Path="ManageMotel.AppHost.csproj" />
+</Solution>

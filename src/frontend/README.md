@@ -25,7 +25,7 @@ Run from `src/frontend`:
 
 | Command                | Purpose                                                             |
 | ---------------------- | ------------------------------------------------------------------- |
-| `npm install`          | install dependencies (required before `aspire run`)                 |
+| `npm ci`               | install dependencies from the lockfile                             |
 | `npm run dev`          | Vite dev server on <http://localhost:5173> (or the injected `PORT`) |
 | `npm run build`        | type-check, then production build into `dist/`                      |
 | `npm run typecheck`    | `tsc -b` only                                                       |
@@ -36,20 +36,17 @@ Run from `src/frontend`:
 
 ## Local development
 
-Aspire is the primary local runner. `aspire run` (or
-`dotnet run --project src/ManageMotel.AppHost`) starts this app as the `frontend`
-resource next to the gateway and services, and shows the URL in the Aspire
-dashboard:
+Follow the [repository startup guide](../../README.md#run-locally-with-aspire)
+to start the `frontend` resource alongside the gateway and backend services.
+Open the frontend URL shown in the Aspire Dashboard.
 
 - Aspire installs dependencies automatically when `node_modules` is missing.
 - Aspire passes `--port` for the endpoint it assigns, so the dashboard URL wins
   over the configured dev-server port.
-- Docker Compose stays an optional infrastructure-only fallback and never starts
-  a second frontend topology.
 
 `npm run dev` alone is supported for frontend-only work. Requests to `/api` and
 `/health` are then proxied to `VITE_DEV_PROXY_TARGET` (default
-`http://localhost:8080`, the YARP gateway endpoint).
+`http://localhost:5241`, the YARP gateway endpoint).
 
 ## Configuration
 
@@ -60,7 +57,7 @@ reach the repository.
 | Variable                | Default                 | Meaning                                               |
 | ----------------------- | ----------------------- | ----------------------------------------------------- |
 | `VITE_API_BASE_URL`     | `/api/v1`               | Gateway base path or absolute URL used by the browser |
-| `VITE_DEV_PROXY_TARGET` | `http://localhost:8080` | Dev proxy target for `/api` and `/health`             |
+| `VITE_DEV_PROXY_TARGET` | `http://localhost:5241` | Dev proxy target for `/api` and `/health`             |
 | `VITE_DEV_SERVER_PORT`  | `5173`                  | Dev server port when Aspire does not inject `PORT`    |
 
 Only `VITE_`-prefixed variables reach the browser bundle. Never place secrets

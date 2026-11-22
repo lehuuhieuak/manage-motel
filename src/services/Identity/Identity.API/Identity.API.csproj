@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\ManageMotel.ServiceDefaults\ServiceDefault\ManageMotel.ServiceDefault.csproj" />
   </ItemGroup>
 
 </Project>

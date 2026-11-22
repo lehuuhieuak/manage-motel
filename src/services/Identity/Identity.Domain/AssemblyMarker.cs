@@ -1,0 +1,4 @@
+﻿namespace Identity.Domain
+{
+    public static class AssemblyMarker;
+}

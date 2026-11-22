@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Rental.API/Rental.API.csproj" />
+  <Project Path="Rental.Application/Rental.Application.csproj" Id="302e3139-8ec1-40ba-a572-0b042c33fb15" />
+  <Project Path="Rental.Domain/Rental.Domain.csproj" Id="fb05c320-c9f1-478e-8b52-77cbaa7655f1" />
+  <Project Path="Rental.Infrastructure/Rental.Infrastructure.csproj" Id="0ad4657b-1ddf-44ca-9321-f3269111ca6e" />
+</Solution>

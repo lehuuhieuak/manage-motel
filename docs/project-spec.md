@@ -332,7 +332,7 @@ Frontend stack:
 * TanStack Query.
 * React Hook Form.
 * Zod.
-* MUI hoặc Ant Design.
+* Tailwind CSS và shadcn/ui.
 
 ## 6. Integration Event Envelope
 

@@ -1,0 +1,26 @@
+﻿<Project Sdk="Aspire.AppHost.Sdk/13.5.3">
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting" Version="13.6.5" />
+	  <PackageReference Include="Aspire.Hosting.Go" Version="13.5.3-preview.1.26425.3" />
+	  <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.6.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gateway\Gateway.csproj" />
+    <ProjectReference Include="..\ManageMotel.ServiceDefaults\ServiceDefault\ManageMotel.ServiceDefault.csproj" />
+    <ProjectReference Include="..\services\Identity\Identity.API\Identity.API.csproj" />
+    <ProjectReference Include="..\services\Billing\Billing.API\Billing.API.csproj" />
+    <ProjectReference Include="..\services\Rental\Rental.API\Rental.API.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
+    <UserSecretsId>5b76a76e-7088-4617-897e-29046115b663</UserSecretsId>
+  </PropertyGroup>
+
+</Project>

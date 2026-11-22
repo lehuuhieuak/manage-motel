@@ -31,9 +31,11 @@ service must never query or modify a database owned by another service.
 
 `.NET Aspire` is the primary local-development orchestrator. It is not a
 Clean Architecture layer, a shared business library, or a production runtime.
-The AppHost declares the local application model and wires services/resources
-such as SQL Server, PostgreSQL, RabbitMQ, the YARP Gateway, .NET services, Go services, and
-the React development server.
+The AppHost declares the local application model. The current scaffold starts
+the YARP Gateway, .NET services, Go services, and the React development server.
+It passes backend endpoint URLs to YARP and the Gateway endpoint URL to Vite.
+See the [startup guide](../README.md#run-locally-with-aspire) for commands and
+health probes.
 
 The repository-level structure is:
 
@@ -41,13 +43,13 @@ The repository-level structure is:
 src/
 ├── ManageMotel.AppHost/
 ├── ManageMotel.ServiceDefaults/
-├── gateway/
+├── Gateway/
 ├── services/
-│   ├── identity/
-│   ├── rental/
-│   ├── metering/
-│   ├── billing/
-│   └── payment/
+│   ├── Identity/
+│   ├── Rental/
+│   ├── Metering/
+│   ├── Billing/
+│   └── Payment/
 └── frontend/
 ```
 
@@ -57,11 +59,13 @@ must not contain domain entities, repository implementations, or business
 rules. Go and React keep their own language-specific observability and
 configuration wiring.
 
-The AppHost provisions two database resources with separate databases:
+The target AppHost topology includes RabbitMQ and two database resources
+with separate databases. Provisioning these resources and injecting their
+connection settings are pending in the current scaffold.
 
 ```text
-SQL Server: identity-db, rental-db, billing-db
-PostgreSQL: metering-db, payment-db
+SQL Server: identity_db, rental_db, billing_db
+PostgreSQL: metering_db, payment_db
 ```
 
 It may run Go and Node applications as executable resources or containers, but
@@ -76,10 +80,10 @@ mechanism.
 
 Each service owns its own database migration. .NET services use EF Core
 migrations for SQL Server; Go services use Goose migrations for PostgreSQL.
-AppHost provisions dependencies and injects configuration; it does not run another service's migrations or
-contain migration/business logic. Development migration commands may be
-provided separately, while production migration execution must be explicit and
-controlled.
+In the target topology, AppHost is responsible for dependency provisioning and
+configuration injection. Migration execution and business logic belong to the
+owning service. Development migration commands may be provided separately,
+while production migration execution must be explicit and controlled.
 
 The AppHost is not required at runtime in production. Any future `aspire
 publish` or deployment target is a separate deployment decision and does not
@@ -87,7 +91,7 @@ change service ownership or the MVP exclusion of Kubernetes.
 
 ## Backend Clean Architecture
 
-Each .NET service uses four projects:
+Identity, Rental, and Billing each use four projects:
 
 ```text
 Service/
@@ -104,6 +108,9 @@ Api -> Application -> Domain
 Infrastructure -> Application and Domain
 Domain -> no infrastructure, framework, or transport dependency
 ```
+
+The YARP API Gateway uses one ASP.NET Core project, `src/Gateway/Gateway.csproj`,
+for HTTP routing, middleware, health endpoints, and ServiceDefaults.
 
 ### Domain
 
